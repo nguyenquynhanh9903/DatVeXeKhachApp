@@ -1,11 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking } from 'react-native';
 import MyContext, { MyUserContext } from '../../configs/MyContext';
 import API, { BASE_URL, authAPI, endpoints } from '../../configs/API';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomerForm from './InfoKhach';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
+import axios from 'axios';
+import MyStyles from '../../styles/MyStyles';
 
 
 const DatVe = ({ route }) => {
@@ -19,6 +21,11 @@ const DatVe = ({ route }) => {
     const [tuyen, setTuyen] = useState([]);
     const [paymentMethod, setPaymentMethod] = useState(null);
     const [le, setLe] = useState([]);
+    const color = {
+        chon: '#0000cd', // Màu xanh dương đậm cho ghế đang chọn
+        chonDuoc: '#006400', // Màu xanh lá cho ghế được chọn
+        trong: '#d3d3d3', // Màu xám cho ghế còn trống
+    }
 
     const loadChuyenXe = async () => {
         try {
@@ -114,6 +121,44 @@ const DatVe = ({ route }) => {
         return giaDinhDang;
     };
 
+    const handlePaymentMoMo = async () => {
+        try {
+            const response = await API.post(endpoints['momo'], null, {
+                headers: {
+                  amount: tinhTien().toString(), 
+                },
+            });
+            if (response.data.payUrl) {
+                Linking.openURL(response.data.payUrl);
+            }
+            else {
+                Alert.alert('Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại sau!');
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert('Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại sau!');
+        }
+    };
+
+    const handlePaymentZalo = async () => {
+        try {
+            const response = await API.post(endpoints['zalo'], null, {
+                headers: {
+                  amount: tinhTien().toString(), 
+                },
+            });
+            if (response.data.order_url) {
+                Linking.openURL(response.data.order_url);
+            }
+            else {
+                Alert.alert('Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại sau!');
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert('Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại sau!');
+        }
+    };
+
     const handleSubmit = async () => {
         if (user && user.Loai_NguoiDung === "3" || user.Loai_NguoiDung === "1" || user.Loai_NguoiDung === "4"){
             try {
@@ -142,10 +187,12 @@ const DatVe = ({ route }) => {
                         case 'momo':
                             // Thực hiện thanh toán qua Momo
                             trangthai_TT = 'Đã thanh toán qua Momo';
+                            handlePaymentMoMo();
                             break;
                         case 'zalo':
                             // Thực hiện thanh toán qua Zalo
-                            trangthai_TT = 'Đã thanh toán qua Zalo';
+                            trangthai_TT = 'Đã thanh toán qua ZaloPay';
+                            handlePaymentZalo();
                             break;
                         case 'cash':
                             // Thực hiện thanh toán trực tiếp tại quầy
@@ -154,6 +201,7 @@ const DatVe = ({ route }) => {
                         default:
                             break;
                     }
+                    navigation.navigate('Danh sách tuyến xe');
                 }
 
                 const veID = [];
@@ -176,6 +224,7 @@ const DatVe = ({ route }) => {
                     veID.push(ticketId);
                 }
                 console.log(veID);
+
                 // 2.1. Thêm dữ liệu chi tiết vé cho từng ghế đã chọn của khách hàng
                 const ticketDetailData = [];
                 for (const c of veID) {
@@ -189,7 +238,7 @@ const DatVe = ({ route }) => {
                                 Ma_Ve: c,
                                 Ma_Xe: parseInt(seat.Bienso_Xe),
                                 Vi_tri_ghe_ngoi: parseInt(seat.id),
-                                Ghichu: "aaaaa",
+                                Ghichu: "Không có",
                             }));
                             ticketDetailData.push(...detailData);
                         } catch (error) {
@@ -289,8 +338,6 @@ const DatVe = ({ route }) => {
                 }
                 console.log(veID);
                 // 2.1. Thêm dữ liệu chi tiết vé cho từng ghế đã chọn của khách hàng
-                const ticketDetailData = [];
-                let a = 0;
                 for (const c of veID) {
                     const ticketDetailData = []; // Khởi tạo mảng mới cho mỗi vé xe
                     await Promise.all(selectedSeats.map(async seat => {
@@ -302,7 +349,7 @@ const DatVe = ({ route }) => {
                                 Ma_Ve: c,
                                 Ma_Xe: parseInt(seat.Bienso_Xe),
                                 Vi_tri_ghe_ngoi: parseInt(seat.id),
-                                Ghichu: "aaaaa",
+                                Ghichu: "Không có",
                             }));
                             ticketDetailData.push(...detailData);
                         } catch (error) {
@@ -349,11 +396,7 @@ const DatVe = ({ route }) => {
                     }
                 }));
                 
-                // Hiển thị thông báo hoặc thực hiện các hành động sau khi hoàn tất quá trình đặt vé thành công
-                Alert.alert('Đã đặt vé thành công!');
-                navigation.navigate('Danh sách đơn hàng');
             } catch (error) {
-                console.error(error);
                 Alert.alert('Có lỗi xảy ra khi thực hiện đặt vé. Vui lòng thử lại sau!');
             }
         }
@@ -362,7 +405,7 @@ const DatVe = ({ route }) => {
     
     return (
         <ScrollView>
-            <Text style={styles.title}>Thông tin đặt vé</Text>
+            <Text style={MyStyles.subject}>THÔNG TIN ĐẶT VÉ</Text>
             {/* Thông tin chuyến xe */}
             <View style={{ flex: 1 }}>
                 <Text style={styles.headerText}>Chuyến Xe</Text>
@@ -433,7 +476,7 @@ const DatVe = ({ route }) => {
                     style={[styles.paymentMethodButton, paymentMethod === 'zalo' && styles.selectedPaymentMethod]}
                     onPress={() => handlePaymentMethodSelect('zalo')}
                 >
-                    <Text style={styles.paymentMethodText}>Thanh toán qua Zalo</Text>
+                    <Text style={styles.paymentMethodText}>Thanh toán qua ZaloPay</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[styles.paymentMethodButton, paymentMethod === 'cash' && styles.selectedPaymentMethod]}

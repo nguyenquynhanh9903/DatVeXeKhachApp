@@ -33,6 +33,12 @@ import ChuyenXeDetail from "./components/ChuyenXe/ChuyenXeDetail";
 import DatVe from "./components/VeXe/VeXe";
 import ThemChuyenXe from "./components/ChuyenXe/ThemChuyenXe";
 import SuaTuyenXe from "./components/TuyenXe/SuaTuyenXe";
+import TaiXe from "./components/TaiXe/TaiXe";
+import ThemTX from "./components/TaiXe/ThemTaiXe";
+import TaiXeDetail from "./components/TaiXe/TaiXeDetail";
+import SuaTaiXe from "./components/TaiXe/SuaTaiXe";
+import ChuyenTaiXe from "./components/TaiXe/TaiXeChuyen";
+import SuaChuyenXe from "./components/ChuyenXe/SuaChuyenXe";
 
 
 const Drawer = createDrawerNavigator();
@@ -40,25 +46,35 @@ const MyDrawer = () => {
   const user = useContext(MyUserContext);
   return(
     
-      <Drawer.Navigator screenOptions={{headerRight: Logout, drawerLabelStyle: {color: "#A60D29"}, drawerActiveBackgroundColor: '#F2CED5', headerTintColor: '#A60D29'}}>
-          <Drawer.Screen name="Home" component={Home} options={{title: 'Home'}}/>
+      <Drawer.Navigator screenOptions={{headerRight: Logout, drawerActiveBackgroundColor: '#F2CED5'}}>
+    
           {user === null ? <>
+            <Drawer.Screen name="Home" component={Home} screenOptions={{headerShown: false}}/>
             <Drawer.Screen name="Register" component={Register} options={{title: 'Đăng ký'}}/>
-            <Drawer.Screen name="RegisterAdmin" component={RegisterAdmin} options={{title: 'Đăng ký tk nhân viên'}} />
             <Drawer.Screen name='Login' component={Login} options={{title: 'Đăng nhập'}} />
           </> : <>
-            <Drawer.Screen name='Profile' component={Profile} options={{title: 'Thông tin tài khoản'}} />
+            <Drawer.Screen name="Home" component={Home} screenOptions={{headerShown: false}}/>
+            <Drawer.Screen name='Profile - Đơn hàng' component={Profile} options={{title: 'Thông tin tài khoản'}} />
+            <Drawer.Screen name='Logout' component={Logout} options={{title: 'Đăng xuất'}} />
           </>}
 
           {user && user.Loai_NguoiDung === "1" && (
             <>
-              <Drawer.Screen name="HomeAdmin" component={HomeNavigator} options={{title: 'Trang chủ quản lý'}} />
+              <Drawer.Screen name="HomeAdmin" component={HomeNavigator} options={{title: 'Quản lý'}} />
               <Drawer.Screen name="RegisterAdmin" component={RegisterAdmin} options={{title: 'Đăng ký tài khoản nhân viên'}} />
-              <Drawer.Screen name="Nhân viên" component={NhanVienStack} />
-              <Drawer.Screen name="Khách hàng" component={KhachHangStack} />
-              <Drawer.Screen name="Tài xế" component={TaiXeStack} />
-              <Drawer.Screen name="Thống kê" component={ThongKeNavigator} />
-              <Drawer.Screen name="Chuyến xe" component={ChuyenXe} />
+            </>
+          )}
+
+          {((user && user.Loai_NguoiDung === "2") || (user && user.Loai_NguoiDung === "3") &&
+            <>
+              <Drawer.Screen name="Tuyến xe" component={TuyenXeNavigator}/>
+            </>
+          )}
+
+          {user && user.Loai_NguoiDung === "4" && (
+            <>
+              <Drawer.Screen name="Tuyến xe" component={TuyenXeNavigator} />
+              <Drawer.Screen name="Tài xế - Chuyến" component={ChuyenTaiXe} />
             </>
           )}
       </Drawer.Navigator>
@@ -70,43 +86,46 @@ const Stack = createStackNavigator();
 
 const HomeNavigator = () => {
   return (
-    <Stack.Navigator>
-      <Drawer.Screen name="HomeAdmin" component={HomeAdmin} options={{title: 'Trang chủ quản lý'}} />
-      <Drawer.Screen name="Thêm tuyến xe" component={ThemTuyenXe} />
-      <Drawer.Screen name="Thêm chuyến xe" component={ThemChuyenXe} />
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Drawer.Screen name="HomeAdmin" component={HomeAdmin} />
+      <Drawer.Screen name="Nhân viên" component={NhanVienNavigator} />
+      <Drawer.Screen name="Khách hàng" component={KhachHangNavigator} />
+      <Drawer.Screen name="Tài xế" component={TaiXeNavigator} />
+      <Drawer.Screen name="Thống kê" component={ThongKeNavigator} />
     </Stack.Navigator>
   )
 }
 
-const NhanVienStack = () => {
+
+const NhanVienNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown: true}}>
       <Stack.Screen name="Nhân viên - Danh sách" component={NhanVien} />
       <Stack.Screen name="Thêm nhân viên" component={ThemNhanVien}/>
       <Stack.Screen name="Thông tin nhân viên" component={NhanVienDetail} />
-      <Stack.Screen name="Chỉnh sửa nhân viên" component={SuaNhanVien} />
+      <Stack.Screen name="Sửa nhân viên" component={SuaNhanVien} />
     </Stack.Navigator>
   );
 }
 
-const KhachHangStack = () => {
+const KhachHangNavigator = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Khách hàng - Danh sách" component={KhachHang} />
-      <Stack.Screen name="Chi tiết khách hàng" component={KhachHangDetail} />
-      <Stack.Screen name="Chỉnh sửa khách hàng" component={SuaKhachHang} />
+      <Stack.Screen name="Thông tin khách hàng" component={KhachHangDetail} />
+      <Stack.Screen name="Sửa khách hàng" component={SuaKhachHang} />
       <Stack.Screen name="Thêm khách hàng" component={ThemKhachHang} />
     </Stack.Navigator>
   );
 }
 
-const TaiXeStack = () => {
+const TaiXeNavigator = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Tài xế - Danh sách" component={KhachHang} />
-      <Stack.Screen name="Chi tiết tài xế" component={KhachHangDetail} />
-      <Stack.Screen name="Chỉnh sửa tài xế" component={SuaKhachHang} />
-      <Stack.Screen name="Thêm tài xế" component={ThemKhachHang} />
+      <Stack.Screen name="Tài xế - Danh sách" component={TaiXe} />
+      <Stack.Screen name="Thông tin tài xế" component={TaiXeDetail} />
+      <Stack.Screen name="Sửa tài xế" component={SuaTaiXe} />
+      <Stack.Screen name="Thêm tài xế" component={ThemTX} />
     </Stack.Navigator>
   );
 }
@@ -121,7 +140,7 @@ const ThongKeNavigator = () => {
   );
 }
 
-const TuyenXeNavigator = () => {
+ const TuyenXeNavigator = () => {
   return (
     <Stack.Navigator>
       <Drawer.Screen name="Danh sách tuyến xe" component={TuyenXe} />
@@ -130,23 +149,38 @@ const TuyenXeNavigator = () => {
       <Drawer.Screen name="Đặt vé" component={DatVe} />
       <Drawer.Screen name="Danh sách vé đã mua" component={Profile}/>
       <Drawer.Screen name="Chỉnh sửa tuyến xe" component={SuaTuyenXe}/>
+      <Drawer.Screen name="Sửa chuyến xe" component={SuaChuyenXe} />
+      <Drawer.Screen name="Thêm tuyến xe" component={ThemTuyenXe} />
+      <Drawer.Screen name="Thêm chuyến xe" component={ThemChuyenXe} />
     </Stack.Navigator>
   );
 }
 
 const Tab = createBottomTabNavigator();
 const MyTab = () => {
+  const user = useContext(MyUserContext);
   return(
-    <Tab.Navigator screenOptions={{headerShown: false, tabBarLabelStyle: {color: "#A60D29"}}}>
+    <Tab.Navigator screenOptions={{headerShown: true, tabBarLabelStyle: {color: "#A60D29"}}}>
+      
       <Tab.Screen name="Home" component={MyDrawer} 
       options={{tabBarIcon: ({color, size}) => (
-        <MaterialCommunityIcons name="menu" color='#A60D29' size={size} />
+      <MaterialCommunityIcons name="home" color='#A60D29' size={size} />
       ),}}/>
 
       <Tab.Screen name='Tuyến xe' component={TuyenXeNavigator} 
       options={{tabBarIcon: ({color, size}) => (
-        <MaterialCommunityIcons name="bus" color='#A60D29' size={size} />
+      <MaterialCommunityIcons name="bus" color='#A60D29' size={size} />
       ),}}/>
+
+      {user !== null && (
+        <>
+          <Tab.Screen name='Tài khoản' component={Profile} 
+          options={{tabBarIcon: ({color, size}) => (
+          <MaterialCommunityIcons name="account" color='#A60D29' size={size} />
+          ),}}/>
+        </>
+      )}
+
     </Tab.Navigator>
   );
 }

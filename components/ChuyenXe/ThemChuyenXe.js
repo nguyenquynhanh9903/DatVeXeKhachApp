@@ -1,165 +1,217 @@
-import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
-import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { List, TextInput } from "react-native-paper";
-import API, { BASE_URL, endpoints } from "../../configs/API";
-import MyStyles from "../../styles/MyStyles";
+import React, { useEffect, useState } from 'react';
+import { Button, Image, View, StyleSheet, Text, TouchableOpacity, ScrollView, Alert, KeyboardAvoidingView } from 'react-native';
+import API, { BASE_URL, endpoints } from '../../configs/API';
+import { Picker } from '@react-native-picker/picker';
+import moment from 'moment';
+import { TextInput } from 'react-native-paper';
 
-const ThemChuyenXe = () => {
-    const nav = useNavigation();
-    const [chuyenXe, setChuyenXe]  = useState({});
-    const [taiXe, setTaiXe] = useState([]);
+export default function ThemCX({navigation, route}) {
+    const { TuyenXeID } = route.params;
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [name, setName] = useState('');
+    const [ngay, setNgay] = useState('');
+    const [giodi, setGioDi] = useState('');
+    const [gioden, setGioDen] = useState('');
+    const [chotrong, setChoTrong] = useState('');
+    const [noidi, setNoiDi] = useState('');
+    const [noiden, setNoiDen] = useState('');
+    const [mataixe, setMaTaiXe] = useState('');
+    const [maxe, setMaXe] = useState('');
+    const [taixe, setTaiXe] = useState([]);
     const [xe, setXe] = useState([]);
-    const [expanded, setExpanded] = useState(true);
-    const handlePress = () => setExpanded(!expanded);
 
-    const fields = [{
-        "label": "Tên chuyến xe",
-        "icon": "text",
-        "name": "TenChuyenXe"
-    
-    }, {
-        "label": "Mã tuyến xe",
-        "icon": "text",
-        "name": "Ma_Tuyen"
-    }, {
-        "label": "Thời gian đi",
-        "icon": "text",
-        "name": "Giodi"
-    }, {
-        "label": "Thời gian đến",
-        "icon": "text",
-        "name": "Gioden"
-    }, {
-        "label": "Chỗ còn trống",
-        "icon": "text",
-        "name": "Cho_trong"
-    }, {
-        "label": "Điểm đi",
-        "icon": "text",
-        "name": "Noidi"
-    }, {
-        "label": "Điểm đến",
-        "icon": "text",
-        "name": "Noiden"
-    },];
-
-    const updateState = (field, value) => {
-        setChuyenXe(current => {
-            return {...current, [field]: value}
-        })
-    }
-
-    const addChuyenXe = async() => {
-        try {
-            let form = new FormData();
-            for(key in chuyenXe)
-                form.append(key, chuyenXe[key]);
-            
-            // Get the selected TaiXe and Xe data
-            const selectedTaiXe = taiXe.find((t) => t.id === chuyenXe.Ma_TaiXe);
-            const selectedXe = xe.find((x) => x.id === chuyenXe.Ma_Xe);
-
-            if (selectedTaiXe && selectedXe) {
-                form.append("Ma_TaiXe", selectedTaiXe.id);
-                form.append("Ma_Xe", selectedXe.id);
-            } else {
-            throw new Error("Vui lòng chọn tài xế và xe");
-    } 
-            console.info(form);
-
-            let response = await API.post(endpoints['them_chuyenXe'],form, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
-            if (response.status !== 201) {
-                throw new Error('Đã xảy ra lỗi khi thêm chuyến xe.');
-            } else {
-                Alert.alert('Thêm chuyến xe thành công.');
+    const loadTaiXe = async () => {
+        if(page > 0){
+            try {
+                setLoading(true);
+                let url = `${endpoints['taixe']}?page=${page}`;
+                let res = await API.get(url);
+                if (page === 1) {
+                    setTaiXe(res.data.results);
+                    setPage(page + 1);
+                } else if (page !== 0) {
+                    setTaiXe(current => [...current, ...res.data.results]);
+                    setPage(page + 1);
+                }
+                if (res.data.next === null) {
+                    setPage(0);
+                }
+            } catch (ex) {
+                console.error(ex);
+            } finally {
+                setLoading(false);
             }
-
-            
-
-        } catch (err) {
-            console.error(err);
-            Alert.alert('Đã xảy ra lỗi khi thêm chuyến xe.');
         }
-        
     };
 
-    const quayLai = () => {
-        nav.navigate('Trang chủ quản lý');
+   
+    const loadXe = async () => {
+        try {
+            setLoading(true);
+            const res = await API.get(endpoints['xe']);
+            setXe(res.data);
+        } catch (ex) {
+            console.error(ex);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadTaiXe();
+        loadXe();
+    }, []);
+
+    const themChuyen = async () => {
+        try {
+        if (!name || !ngay || !giodi || !gioden || !chotrong || !noidi || !noiden || !mataixe || !maxe) {
+            alert('Vui lòng nhập đầy đủ thông tin');
+            return;
+        }
+        const formattedNgay = moment(ngay, 'DD/MM/YYYY').format('YYYY-MM-DD');
+        const response = await fetch(BASE_URL + endpoints['them_chuyenXe'], {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+            TenChuyenXe: name,
+            Ngay: formattedNgay,
+            Ma_Tuyen: parseInt(TuyenXeID),
+            Giodi: giodi,
+            Gioden: gioden,
+            Cho_trong: chotrong,
+            Noidi: noidi,
+            Noiden: noiden,
+            Ma_TaiXe: parseInt(mataixe),
+            Ma_Xe: parseInt(maxe),
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Đã xảy ra lỗi khi thêm chuyến xe');
+        }
+            alert('Thêm chuyến xe thành công!.');
+            setName('');
+            setNgay('');
+            setGioDi('');
+            setGioDen('');
+            setChoTrong('');
+            setNoiDi('');
+            setNoiDen('');
+            setMaTaiXe('');
+            setMaXe('');
+            quayLai(TuyenXeID);
+        } catch (error) {
+        console.error('Lỗi:', error.message);
+        Alert.alert('Lưu ý' ,'Đã xảy ra lỗi khi thêm chuyến xe');
+        }
+    };
+
+    const quayLai = (TuyenXeID) => {
+        navigation.navigate('Chuyến xe', {TuyenXeID});
     }
 
     return (
         <KeyboardAvoidingView>
-            <ScrollView>
-                {fields.map(t => <TextInput
-                value={chuyenXe[t.name]}
-                onChangeText={c => updateState(t.name, c)} 
-                key={t.label} 
-                style={MyStyles.margin}
-                label={t.label}
-                right={<TextInput.Icon icon={t.icon} />} />)}
-
-                <View>
-                    <List.Accordion style={[styles.input]}
-                        title="Mã tài xế"
-                        expanded={expanded}
-                        onPress={handlePress}
-                    >
-                        {taiXe.map((t) => (
-                            <List.Item key={t.id} title={t.name} onPress={() => handleSelect(t.id, "TaiXe")} />
-                        ))}
-                    </List.Accordion>
-                </View>
-
-                <View>
-                    <List.Accordion style={[styles.input]}
-                        title="Mã xe"
-                        expanded={expanded}
-                        onPress={handlePress}
-                    >
-                        {xe.map((x) => (
-                            <List.Item key={x.id} title={x.name} onPress={() => handleSelect(x.id, "Xe")} />
-                        ))}
-                    </List.Accordion>
-                </View>
-        
+            <ScrollView contentContainerStyle={{ alignItems: 'center' }} style={{ marginTop: 15 }}>
+                <TextInput
+                    style={styles.input}
+                    label="Tên chuyến xe"
+                    value={name}
+                    onChangeText={text => setName(text)}
+                />
+                <Text> Vui lòng nhập ngày theo định dạng DD/MM/YYYY!</Text>
+                <TextInput
+                    style={styles.input}
+                    label="Ngày"
+                    value={ngay}
+                    onChangeText={text => setNgay(text)}
+                />
+                <TextInput
+                    style={styles.input}
+                    label="Giờ Đi"
+                    value={giodi}
+                    onChangeText={text => setGioDi(text)}
+                />
+                <TextInput
+                    style={styles.input}
+                    label="Giờ Đến"
+                    value={gioden}
+                    onChangeText={text => setGioDen(text)}
+                />
+                <TextInput
+                    style={styles.input}
+                    label="Số Chỗ"
+                    value={chotrong}
+                    onChangeText={text => setChoTrong(text)}
+                />
+                <TextInput
+                    style={styles.input}
+                    label="Nơi Đi"
+                    value={noidi}
+                    onChangeText={text => setNoiDi(text)}
+                />
+                <TextInput
+                    style={styles.input}
+                    label="Nơi Đến"
+                    value={noiden}
+                    onChangeText={text => setNoiDen(text)}
+                />
+                <Picker
+                    selectedValue={mataixe}
+                    style={styles.input}
+                    onValueChange={(itemValue, itemIndex) => setMaTaiXe(itemValue)}
+                >
+                    <Picker.Item label="Chọn tài xế" value="" />
+                    {taixe.map((tx, index) => (
+                    <Picker.Item key={index} label={tx.Ten_taixe} value={tx.id} />
+                    ))}
+                </Picker>
+                <Picker
+                    selectedValue={maxe}
+                    style={styles.input}
+                    onValueChange={(itemValue, itemIndex) => setMaXe(itemValue)}
+                >
+                    <Picker.Item label="Chọn xe" value="" />
+                    {xe.map((x, index) => (
+                    <Picker.Item key={index} label={x.Bien_so} value={x.id} />
+                    ))}
+                </Picker>
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={[styles.button, {width: 'auto'}]} onPress={quayLai}>
-                        <Text style={styles.buttonText}>Quay lại</Text>
+                    <TouchableOpacity style={[styles.button]} onPress={() => {quayLai(parseInt(TuyenXeID))}}>
+                        <Text style={styles.buttonText}>Quay Lại</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, {width: 'auto'}]} onPress={addChuyenXe}>
-                        <Text style={styles.buttonText}>Thêm tuyến xe</Text>
+                    <TouchableOpacity style={[styles.button, { width: 'auto' }]} onPress={themChuyen}>
+                        <Text style={styles.buttonText}>Thêm chuyến xe</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
-        
     );
 }
 
 const styles = StyleSheet.create({
     input: {
-        marginBottom: 5,
-        width: '100%',
-        height: 60,
-        //borderColor: 'gray',
-        //borderWidth: 5,
+        marginBottom: 10,
+        width: '90%',
+        height: 55,
+        borderColor: 'gray',
+        borderWidth: 1,
         paddingHorizontal: 10,
-        //borderRadius: 5,
+        borderRadius: 5,
+        backgroundColor:'#F2CED5'
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingHorizontal: 5,
         marginTop: 20,
+        marginBottom: 50,
     },
     button: {
-        backgroundColor: '#007bff',
+        backgroundColor: '#BF6B7B',
         paddingVertical: 12,
         borderRadius: 5,
         alignItems: 'center',
@@ -173,5 +225,3 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
 });
-
-export default ThemChuyenXe;

@@ -11,6 +11,8 @@ export const endpoints = {
     'xe': '/Xe/',
     've': '/VeXe/',
     'le': '/le/',
+    'momo': '/payment/',
+    'zalo':'/zalo/payment/',
     'chucvu': '/loainguoidung/',
     'chitietve': '/chitietve/',
     'them_NV': '/NhanVien/Them_NV/',

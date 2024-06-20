@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Button, Image, View, TextInput, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import { Image, View, StyleSheet, Text, TouchableOpacity, Alert, KeyboardAvoidingView} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { ScrollView } from 'react-native-gesture-handler';
 import { BASE_URL, endpoints } from '../../configs/API';
 import { Picker } from '@react-native-picker/picker';
+import { Button, TextInput } from 'react-native-paper';
 
 const ThemKhachHang = ({navigation}) => {
   const [name, setName] = useState('');
@@ -14,7 +15,7 @@ const ThemKhachHang = ({navigation}) => {
   const [dienThoai, setDienThoai] = useState('');
   const [email, setEmail] = useState('');
   const [avatar, setAvatar] = useState(null);
-  const [loai_Kh, setLoaiKH] = useState('trực tiếp');
+  const [loai_Kh, setLoaiKH] = useState('1');
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -35,16 +36,16 @@ const ThemKhachHang = ({navigation}) => {
   const addKhachHang = async () => {
     try {
       if (!name || !ngaySinh || !gioiTinh || !diaChi || !cmnd || !dienThoai || !email || !avatar) {
-        alert('Vui lòng nhập đầy đủ thông tin và chọn ảnh đại diện');
+        Alert.alert('Lưu ý','Vui lòng nhập đầy đủ thông tin và chọn ảnh đại diện');
         return;
       }
 
-      let loaiKhachHangId = '';
-      if (loai_Kh === 'trực tiếp') {
-        loaiKhachHangId = '1';
-      } else if (loai_Kh === 'Online') {
-        loaiKhachHangId = '2';
-      }
+      // let loaiKhachHangId = '';
+      // if (loai_Kh === 'trực tiếp') {
+      //   loaiKhachHangId = '1';
+      // } else if (loai_Kh === 'Online') {
+      //   loaiKhachHangId = '2';
+      // }
   
       const response = await fetch(BASE_URL + endpoints['them_KH'], {
         method: 'POST',
@@ -60,7 +61,7 @@ const ThemKhachHang = ({navigation}) => {
           DienThoai: dienThoai,
           Email: email,
           avatar: avatar, 
-          Loai_KH: loaiKhachHangId,
+          Loai_KH: loai_Kh,
         }),
       });
   
@@ -69,7 +70,7 @@ const ThemKhachHang = ({navigation}) => {
       }
   
       // Nếu thành công, hiển thị thông báo và xóa các trường nhập
-      alert('Thêm khách hàng thành công!');
+      Alert.alert('Thông báo','Thêm khách hàng thành công!');
       setName('');
       setNgaySinh('');
       setGioiTinh('');
@@ -78,59 +79,59 @@ const ThemKhachHang = ({navigation}) => {
       setDienThoai('');
       setEmail('');
       setAvatar(null);
-      setLoaiKH('');
+      setLoaiKH('1');
     } catch (error) {
       console.error('Lỗi:', error.message);
-      alert('Đã xảy ra lỗi khi thêm khách hàng');
+      Alert.alert('Đã xảy ra lỗi khi thêm khách hàng');
     }
   };
   
   const quayLai = () => {
-    navigation.navigate('Khách Hàng - Danh Sách');
+    navigation.navigate('Khách hàng - Danh sách');
   }
 
   return (
-      <ScrollView contentContainerStyle={{ alignItems: 'center' }} style={{marginTop: 50}}>
-        <Text style={styles.title}>Đăng Ký khách hàng</Text>
+    <KeyboardAvoidingView>
+      <ScrollView contentContainerStyle={{ alignItems: 'center' }} style={{marginTop: 25}}>
         <TextInput
           style={styles.input}
-          placeholder="Tên khách hàng"
+          label="Tên khách hàng"
           value={name}
           onChangeText={text => setName(text)}
         />
         <TextInput
           style={styles.input}
-          placeholder="Ngày sinh"
+          label="Ngày sinh"
           value={ngaySinh}
           onChangeText={text => setNgaySinh(text)}
         />
         <TextInput
           style={styles.input}
-          placeholder="Giới tính"
+          label="Giới tính"
           value={gioiTinh}
           onChangeText={text => setGioiTinh(text)}
         />
         <TextInput
           style={styles.input}
-          placeholder="Địa chỉ"
+          label="Địa chỉ"
           value={diaChi}
           onChangeText={text => setDiaChi(text)}
         />
         <TextInput
           style={styles.input}
-          placeholder="CMND"
+          label="CMND"
           value={cmnd}
           onChangeText={text => setCMND(text)}
         />
         <TextInput
           style={styles.input}
-          placeholder="Điện thoại"
+          label="Điện thoại"
           value={dienThoai}
           onChangeText={text => setDienThoai(text)}
         />
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          label="Email"
           value={email}
           onChangeText={text => setEmail(text)}
         />
@@ -148,9 +149,9 @@ const ThemKhachHang = ({navigation}) => {
         <View style={{marginBottom: 30}}>
           <View style={styles.imagePickerContainer}>
             <Text style={{ marginRight: 10 }}>Chọn ảnh đại diện:</Text>
-            <Button title="Chọn ảnh" onPress={pickImage} />
+            <Button style={{backgroundColor: "#4f6e4b"}} mode="contained" onPress={pickImage}>CHỌN ẢNH</Button>
           </View>
-          {avatar && <Image source={{ uri: `file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252FMyMobileApp-caeae716-14f8-42e8-8345-b048446019bf/ImagePicker/${avatar}`}} style={styles.image} />}
+          {avatar && <Image source={{ uri: `file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252FDatVeXeKhachApp-8eb51fdd-b5f9-455f-b225-8f4db299e1f9/ImagePicker/${avatar}`}} style={styles.image} />}
         </View>
         <View style={styles.buttonContainer}>
             <TouchableOpacity style={[styles.button, { width: 'auto' }]} onPress={quayLai}>
@@ -161,6 +162,7 @@ const ThemKhachHang = ({navigation}) => {
             </TouchableOpacity>
         </View>
       </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -177,18 +179,20 @@ const styles = StyleSheet.create({
       },
       input: {
         marginBottom: 10,
-        width: 200,
-        height: 40,
+        width: '90%',
+        height: 55,
         borderColor: 'gray',
         borderWidth: 1,
         paddingHorizontal: 10,
         borderRadius: 5,
+        backgroundColor:'#F2CED5'
       },
       image: {
         width: 200,
         height: 200,
         marginTop: 10,
-        borderRadius: 5,
+        borderRadius: 20,
+        marginLeft: 30
       },
       buttonContainer: {
         flexDirection: 'row',
@@ -197,7 +201,7 @@ const styles = StyleSheet.create({
         marginTop: -20,
       },
       button: {
-        backgroundColor: '#007bff',
+        backgroundColor: '#BF6B7B',
         paddingVertical: 12,
         borderRadius: 5,
         alignItems: 'center',
@@ -206,7 +210,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
       },
       buttonText: {
-        color: '#fff',
+        color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
       },
@@ -223,8 +227,9 @@ const styles = StyleSheet.create({
         marginBottom: 5,
       },
       picker: {
-        width: 200,
+        width: 170,
         height: 40,
+        backgroundColor: '#d8d6d0'
       },
 });  
 

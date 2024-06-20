@@ -52,11 +52,13 @@ const Login = () => {
                 "payload": userRes.data
             });
 
-            if (userRes.data.Loai_NguoiDung === "1") {
-                nav.navigate("HomeAdmin");
-            } else {
-                nav.navigate("Home");
-            }
+            nav.navigate("Home")
+
+            //if (userRes.data.Loai_NguoiDung === "1") 
+            //    nav.navigate("HomeAdmin");
+            // } else {
+            //     nav.navigate("Home");
+            // }
 
             
 

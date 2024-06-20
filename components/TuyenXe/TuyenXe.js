@@ -29,7 +29,7 @@ const TuyenXe = () => {
                     url = `${endpoints['tuyenxe']}?diemden=${den}&page=${page}`;
                 }
                 else {
-                    url = `${endpoints['tuyenxe']}`
+                    url = `${endpoints['tuyenxe']}?page=${page}`;
                 }
                 let res = await API.get(url);
                 if (page === 1) {
@@ -83,48 +83,55 @@ const TuyenXe = () => {
         callback(value)
     }
 
-    const gotoSuaTuyenXe = () => {
-        navigation.navigate('Chỉnh sửa tuyến xe');
+    const gotoSuaTuyenXe = (TuyenXeID) => {
+        navigation.navigate('Chỉnh sửa tuyến xe', {TuyenXeID});
     }
 
     return (
         <View style={MyStyles.container}>
-            <View style={{ flexDirection: 'column', alignItems: 'center', marginTop: 50 }}>
+            <View style={{ flexDirection: 'column', alignItems: 'center', marginTop: 20 }}>
                 <Searchbar placeholder="Nhập điểm đi..." onChangeText={(t) => search(t, setDi)} value={di} style={styles.search}/>
                 {/* <Icon name="arrow-right" size={27} color="#900" /> */}
                 <Searchbar placeholder="Nhập điểm đến..." onChangeText={(t) => search(t, setDen)} value={den} style={styles.search}/>
             </View>
-            <ScrollView refreshControl={<RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}/>} onScroll={loadMore}>
-                {loading && <ActivityIndicator/>}
-                { tuyenxe && tuyenxe.map(
-                    c => (
-                        <TouchableOpacity key={c.id}>
-                            <View key={c.id} >
-                                <List.Item style={styles.margin} 
-                                    title={c.Ten_tuyen} 
-                                    right={() => (
-                                        <View style={styles.buttonContainer}>
-                                            <TouchableOpacity style={[styles.button]} onPress={() => {
-                                                Alert.alert('Lưu ý', 'Nếu bạn chưa thấy dữ liệu vui lòng Refresh');
-                                                gotoChuyenXe(parseInt(c.id))} } 
-                                            >
-                                                <Text>Tìm kiếm</Text>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity style={[styles.button]} onPress={gotoSuaTuyenXe}>
-                                                <Text>Sửa</Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    )}
-                                />
-                            </View>
-                        </TouchableOpacity>    
-                    ))
-                }
-                {loading && page > 1 && <ActivityIndicator/>}
-            </ScrollView>
+            
+            
+                <ScrollView refreshControl={<RefreshControl refreshing={refreshing}
+                onRefresh={onRefresh}/>} onScroll={loadMore}>
+                    {loading && <ActivityIndicator/>}
+                    { tuyenxe && tuyenxe.map(
+                        c => (
+                            <TouchableOpacity key={c.id}>
+                                <View key={c.id} >
+                                    <List.Item style={styles.margin} 
+                                        title={c.Ten_tuyen} 
+                                        right={() => (
+                                            <View style={styles.buttonContainer}>
+                                                <TouchableOpacity style={[styles.button]} onPress={() => {
+                                                    Alert.alert('Lưu ý', 'Nếu bạn chưa thấy dữ liệu vui lòng Refresh');
+                                                    gotoChuyenXe(parseInt(c.id))} } 
+                                                >
+                                                    <Text>Tìm kiếm</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity style={[styles.button]} onPress={gotoSuaTuyenXe}>
+                                                    <Text>Sửa</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        )}
+                                    />
+                                </View>
+                            </TouchableOpacity>    
+                        ))
+                    }
+                    {loading && page > 1 && <ActivityIndicator/>}
+                    <TouchableOpacity style={[styles.button]} onPress={() => {navigation.navigate('Thêm tuyến xe')}}>
+                        <Text>Thêm tuyến xe</Text>
+                    </TouchableOpacity>
+                </ScrollView>
+               
+                
         </View>
+        
     )
 }
 

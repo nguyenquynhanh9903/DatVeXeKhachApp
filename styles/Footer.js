@@ -3,17 +3,21 @@ import { StyleSheet, Text, View } from "react-native";
 const Footer = () => {
     return(
         <View style={styles.container}>
-            <Text style={styles.title}>TRUNG TÂM TỔNG ĐÀI & CSKH</Text>
-            <Text style={styles.phone}>1900 2548</Text>
-            <Text style={styles.company}>CÔNG TY CỔ PHẦN XE KHÁCH ÁNH DƯƠNG</Text>
-            <Text style={styles.address}>Địa chỉ: 97 Võ Văn Tần, phường 6, quận 3, Thành phố Hồ Chí Minh</Text>
-            <Text style={styles.email}>Email: hotro@anhduong.vn</Text>
-            <Text style={styles.fax}>Điện thoại: 02845134513</Text>
-            <Text style={styles.fax}>Fax: 02845154515</Text>
+            <View style={{alignItems: 'center'}}>
+                <Text style={styles.title}>TRUNG TÂM TỔNG ĐÀI & CSKH</Text>
+                <Text style={styles.phone}>1900 2548</Text>
+                <Text style={styles.company}>CÔNG TY CỔ PHẦN XE KHÁCH MAI ANH</Text>
+                <Text style={styles.address}>Địa chỉ: 97 Võ Văn Tần, phường 6, quận 3, Thành phố Hồ Chí Minh</Text>
+                <Text style={styles.email}>Email: hotro@maianhbus.vn</Text>
+                <Text style={styles.fax}>Điện thoại: 02845134513</Text>
+                <Text style={styles.fax}>Fax: 02845154515</Text>
+            </View>
 
+            <View style={{backgroundColor: '#708b50', width: 400, height: 80, marginTop: 20}}>
+                <Text style={[styles.footerCopyright]}>© 2024 | Đề tài: Quản lý đặt vé xe khách |
+                Sinh viên thực hiện: Phan Thị Tuyết Mai - Nguyễn Ngọc Quỳnh Anh</Text>
+            </View>
             
-            <Text style={[styles.footerCopyright]}>© 2024 | Đề tài: Quản lý đặt vé xe khách |
-                    Sinh viên thực hiện: Phan Thị Tuyết Mai - Nguyễn Ngọc Quỳnh Anh</Text>
            
         </View>
     );
@@ -22,21 +26,23 @@ const Footer = () => {
 const styles = StyleSheet.create({
     container: {
         padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: '#d989ae',
         alignItems: 'center',
+        marginTop: 20,
+        //paddingTop: 30
     },
     title: {
         fontSize: 18,
         fontWeight: 'bold',
     },
     phone: {
-        fontSize: 20,
-        color: '#f00',
+        fontSize: 25,
+        color: '#d90d19',
     },
     company: {
         fontSize: 16,
         fontWeight: 'bold',
-        marginTop: 10,
+        marginTop: 5,
     },
     address: {
         fontSize: 14,
@@ -50,9 +56,11 @@ const styles = StyleSheet.create({
     },
     footerCopyright: {
         backgroundColor: '#OB2559',
-        color: 'black',
+        color: 'white',
         marginTop: 20,
-        fontSize: 12,
+        marginLeft: 10,
+        marginRight: 10,
+        fontSize: 13,
         textAlign: 'center',
     },
 });

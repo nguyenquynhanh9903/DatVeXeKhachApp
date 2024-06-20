@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MyContext, { MyUserContext } from '../../configs/MyContext';
 import API, { endpoints } from '../../configs/API';
 import { ScrollView } from 'react-native';
-import { Button } from 'react-native-paper';
+import { Button, TouchableRipple } from 'react-native-paper';
+import MyStyles from '../../styles/MyStyles';
 
 
 const Profile = () => {
@@ -155,7 +156,7 @@ const Profile = () => {
         <>
             <ScrollView>
             <View>
-                <Text style={{fontSize: 20, marginLeft: 100, marginTop: 15, marginBottom: 15, fontWeight: 'bold'}}>THÔNG TIN TÀI KHOẢN</Text>
+                <Text style={MyStyles.subject}>THÔNG TIN TÀI KHOẢN</Text>
                 <View>
                     <Image
                         source={{
@@ -166,18 +167,20 @@ const Profile = () => {
                         style={styles.image} 
                         resizeMethod='auto'
                     />
-                    <View style={{marginLeft: 50}}>
-                        <Text style={{fontSize: 25}}>Tên : {user.username}</Text>
-                        <Text style={{fontSize: 25}}>Email: {user.email}</Text>
+                    <View style={styles.border}>
+                        <Text style={styles.text}>Tên : {[ user.last_name, user.first_name].join(' ')}</Text>
+                        <Text style={styles.text}>Email: {user.email}</Text>
                         {chucvu && chucvu.map(
                             c => (
-                                <Text key={c.id} style={{fontSize: 25}}>Bạn là: {c.loai.toUpperCase()}</Text>
+                                <Text key={c.id} style={styles.text}>Bạn là: {c.loai.toUpperCase()}</Text>
                             )
                         )}
                     </View>
                 </View>
             </View>
-            <Text style={styles.detailsLink} onPress={toggleTicketDetailsVisibility}>Xem chi tiết đơn hàng</Text>
+            <TouchableRipple>
+                <Text style={styles.detailsLink} onPress={toggleTicketDetailsVisibility}>Xem chi tiết đơn hàng</Text>
+            </TouchableRipple>
                 {ticketDetailsVisible && renderTicketDetails()}
             </ScrollView>
         </>
@@ -191,8 +194,8 @@ const Profile = () => {
             alignItems: 'center',
         },
         text: {
-            fontSize: 20,
-            fontWeight: 'bold',
+            fontSize: 18,
+            //fontFamily:'sans-serif'
         },
         itemContainer: {
             borderWidth: 1, 
@@ -211,8 +214,10 @@ const Profile = () => {
         image: {
             width: 200,
             height: 200,
+            marginTop: 25,
             marginBottom: 25, 
-            marginLeft: 98
+            marginLeft: 98,
+            borderRadius: 100,
         },
         detailsLink: {
             color: 'blue',
@@ -220,6 +225,18 @@ const Profile = () => {
             marginTop: 10,
             marginLeft: 260,
         },
+        border: {
+            justifyContent: 'center',
+            backgroundColor:'#F2B6C1',
+            borderColor: 'black',
+            borderWidth: 2,
+            borderRadius: 20,
+            padding: 20,
+            marginTop: 10,
+            marginLeft:30,
+            marginRight: 40,
+            marginBottom: 30,
+        }
     });
     
 export default Profile;

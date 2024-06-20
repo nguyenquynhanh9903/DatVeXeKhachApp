@@ -15,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 const ChuyenXe = ({ route }) => {
     const { TuyenXeID } = route.params;
     const navigation = useNavigation();
+    const [page, setPage] = useState(1);
     const [chuyenxe, setChuyenXe] = useState([]);
     const [tuyenxe, setTuyenXe] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -28,6 +29,8 @@ const ChuyenXe = ({ route }) => {
     const [showAlert, setShowAlert] = useState(false);
     const [searchResultFound, setSearchResultFound] = useState(true);
     const [ngayle, setNgayLe] = useState([]);
+    const [taixe, setTaiXe] = useState([]);
+    const [xe, setXe] = useState([]);
 
 
 
@@ -70,10 +73,46 @@ const ChuyenXe = ({ route }) => {
         }
     };
 
+    const loadTaiXe = async () => {
+        if (page > 0) {
+            try {
+                setLoading(true);
+                let url = `${endpoints['taixe']}?page=${page}`;
+                let res = await API.get(url);
+                if (page === 1) {
+                    setTaiXe(res.data.results);
+                    setPage(page + 1);
+                } else if (page !== 0) {
+                    setTaiXe(current => [...current, ...res.data.results]);
+                    setPage(page + 1);
+                } 
+                if (res.data.next === null) {
+                    setPage(0);
+                }
+            } catch (ex) {
+                console.error(ex);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+    const XeData = async () => {
+        try {
+
+        } catch (ex) {
+            console.error(ex);
+        }finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         loadCX();
         loadTX();
         loadNgayLe();
+        loadTaiXe();
+        XeData();
     }, []);
 
     const onRefresh = () => {
@@ -181,12 +220,16 @@ const ChuyenXe = ({ route }) => {
     const gioArray = uniqueArray(chuyenxe.map(c=> c.Giodi));
 
     const gotoChuyenXeDetail = (ChuyenXeID, Gia) => {
-        navigation.navigate('ChuyenXeDetail', { ChuyenXeID, Gia });
+        navigation.navigate('Chi tiết chuyến xe', { ChuyenXeID, Gia });
     }
 
     const goToTuyenXe = () => {
-        navigation.navigate('Tuyến Xe');
-      }
+        navigation.navigate('Danh sách tuyến xe');
+    }
+
+    const goToThemChuyen = () => {
+        navigation.navigate('Thêm chuyến xe', {TuyenXeID});
+    }
 
     return (
         <View style={MyStyles.container}>
@@ -207,8 +250,8 @@ const ChuyenXe = ({ route }) => {
                             mode="date"
                         />
                     ) : (
-                        <TouchableOpacity onPress={() => setShowDatePicker(true)} style={{marginTop: 10}}>
-                            <Text style={{fontSize: 20}}>Ngày</Text>
+                        <TouchableOpacity onPress={() => setShowDatePicker(true)} style={{marginTop: 10, marginLeft: 3}}>
+                            <Text style={{fontSize: 18}}>Ngày</Text>
                         </TouchableOpacity>
                     )}
                     {showDatePicker && (
@@ -226,7 +269,7 @@ const ChuyenXe = ({ route }) => {
                             setSelectNoi(itemValue);
                             searchByNoi(itemValue);
                         }}
-                        style={styles.picker} >
+                        style={[styles.picker, {marginLeft: 10}]} >
                             <Picker.Item label="Nơi khởi hành" value="" />
                             {noiArray.map((value, index) => (
                                 <Picker.Item key={index} label={value} value={value} />
@@ -239,7 +282,7 @@ const ChuyenXe = ({ route }) => {
                             setSelectTime(itemValue);
                             searchByTime(itemValue);
                         }}
-                        style={styles.picker} >
+                        style={[styles.picker]} >
                             <Picker.Item label="Thời gian đi" value="" />
                             {gioArray.map((value, index) => (
                                 <Picker.Item key={index} label={value} value={value} />
@@ -279,12 +322,31 @@ const ChuyenXe = ({ route }) => {
                                         <FontAwesomeIcon style={{fontSize: 24, marginTop: 25}} icon={faLocationDot} />
                                         <Text style={{fontSize: 24, marginTop: 15}}>{c.Gioden}</Text>
                                     </View>
+
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                         <Text style={{fontSize: 15, marginTop: 15}}>{c.Noidi}</Text>
                                         <Text style={{fontSize: 15, marginTop: 15}}>{c.Noiden}</Text>
                                     </View>
+
+                                    <View>
+                                        {taixe && taixe.map(t => {
+                                            if (t.id === c.Ma_TaiXe){
+                                                return(
+                                                    <Text key={t.id} style={{fontSize: 15, marginTop: 15}}>Tài xế: {t.Ten_taixe}</Text>
+                                                );
+                                            }
+                                        })}
+                                        {xe && xe.map (x => {
+                                            if(x.id === c.Ma_Xe) {
+                                                return(
+                                                    <Text key={x.id} style={{fontSize: 15, marginTop: 15}}>Xe: {x.Bien_so}</Text>
+                                                );
+                                            }
+                                        })}
+                                    </View>
+
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                        <Text style={{fontSize: 15, marginTop: 15}}>{loaiXe(c.Ma_Xe)} {c.Cho_trong} chỗ trống</Text>
+                                        <Text style={{fontSize: 15, marginTop: 15}}>{loaiXe(c.Ma_Xe)} {c.Cho_trong} chỗ</Text>
                                         <Text style={{fontSize: 15, marginTop: 15}}>{formDate(c.Ngay)}</Text>
                                         <Text style={{fontSize: 15, marginTop: 15}} key={d.id}>{tinhGia(c.Ngay,d.BangGia)}</Text>
                                     </View>
@@ -297,7 +359,7 @@ const ChuyenXe = ({ route }) => {
                                     <View style={styles.rectangle}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Text style={{fontSize: 24, marginTop: 15}}>{c.Giodi}</Text>
-                                            <FontAwesomeIcon style={{fontSize: 24, marginTop: 25}} icon={faCircleDot} />
+                                            <FontAwesomeIcon style={{fontSize: 24, marginTop: 25, color: '#3a5231'}} icon={faCircleDot} />
                                             <View style={{ flexDirection: 'row'}}>
                                                 <FontAwesomeIcon style={{fontSize: 24, marginTop: 25}} icon={faEllipsis} />
                                                 <FontAwesomeIcon style={{fontSize: 24, marginTop: 25}} icon={faEllipsis} />
@@ -308,15 +370,33 @@ const ChuyenXe = ({ route }) => {
                                                 <FontAwesomeIcon style={{fontSize: 24, marginTop: 25}} icon={faEllipsis} />
                                                 <FontAwesomeIcon style={{fontSize: 24, marginTop: 25}} icon={faEllipsis} />
                                             </View>
-                                            <FontAwesomeIcon style={{fontSize: 24, marginTop: 25}} icon={faLocationDot} />
+                                            <FontAwesomeIcon style={{fontSize: 24, marginTop: 25, color: '#a91127'}} icon={faLocationDot} />
                                             <Text style={{fontSize: 24, marginTop: 15}}>{c.Gioden}</Text>
                                         </View>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Text style={{fontSize: 15, marginTop: 15}}>{c.Noidi}</Text>
                                             <Text style={{fontSize: 15, marginTop: 15}}>{c.Noiden}</Text>
                                         </View>
+
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                            <Text style={{fontSize: 15, marginTop: 15}}>{loaiXe(c.Ma_Xe)} {c.Cho_trong} chỗ trống</Text>
+                                        {taixe && taixe.map(t => {
+                                            if (t.id === c.Ma_TaiXe){
+                                                return(
+                                                    <Text key={t.id} style={{color: '#bcb8b1' ,fontSize: 15, marginTop: 15}}>Tài xế: {t.Ten_taixe}</Text>
+                                                );
+                                            }
+                                        })}
+                                        {xe && xe.map (x => {
+                                            if(x.id === c.Ma_Xe) {
+                                                return(
+                                                    <Text key={x.id} style={{fontSize: 15, marginTop: 15}}>Xe: {x.Bien_so}</Text>
+                                                );
+                                            }
+                                        })}
+                                        </View>
+
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <Text style={{fontSize: 15, marginTop: 15}}>{loaiXe(c.Ma_Xe)} {c.Cho_trong} chỗ</Text>
                                             <Text style={{fontSize: 15, marginTop: 15}}>{formDate(c.Ngay)}</Text>
                                             {tuyenxe && tuyenxe.map(
                                                 d => (
@@ -331,9 +411,12 @@ const ChuyenXe = ({ route }) => {
                     )))
                 }
                 <View style={styles.buttonContainer}>
-                      <TouchableOpacity style={[styles.button, { width: 100 }]} onPress={goToTuyenXe}>
-                        <Text>Quay lại</Text>
-                      </TouchableOpacity>
+                    <TouchableOpacity style={[styles.button, { width: 100 }]} onPress={goToTuyenXe}>
+                        <Text style={styles.buttonText}>Quay lại</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.button]} onPress={() => {goToThemChuyen(parseInt(TuyenXeID))}}>
+                        <Text style={styles.buttonText}>Thêm chuyến xe</Text>
+                    </TouchableOpacity>
                 </View>
                 {loading && <ActivityIndicator/>}
             </ScrollView>
@@ -345,10 +428,10 @@ const styles = StyleSheet.create({
     tieude: {
         width: 412,
         height: 100,
-        backgroundColor: 'orange',
+        backgroundColor: '#73c0b0',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: -59,
+        marginTop: 0,
     },
     buttonContainer: {
       flexDirection: 'row',
@@ -357,7 +440,7 @@ const styles = StyleSheet.create({
     },
     button: {
       alignItems: 'center',
-      backgroundColor: 'pink',
+      backgroundColor: '#BF6B7B',
       padding: 10,
       marginVertical: 10,
       borderRadius: 5,
@@ -365,19 +448,17 @@ const styles = StyleSheet.create({
     text: {
         color: 'white',
         fontSize: 20,
+        fontWeight: 'bold'
     },
     picker: {
-        height: 40,
-        width: '43%',
-        backgroundColor: 'orange', // Màu nền của picker
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
+        height: 35,
+        width: '42%',
+        backgroundColor: '#73c0b0', // Màu nền của picker
         marginTop: 10,
     },
     rectangle: {
         width: 409,
-        height: 130,
+        height: 185,
         backgroundColor: 'white', // Màu nền trắng
         marginBottom: 20,
     },
@@ -386,13 +467,20 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginTop: 20,
       },
-      button: {
-        alignItems: 'center',
-        backgroundColor: 'pink',
-        padding: 10,
-        marginVertical: 10,
+    button: {
+        backgroundColor: '#BF6B7B',
+        paddingVertical: 12,
         borderRadius: 5,
-      },
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        marginHorizontal: 5,
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
   });
 
   export default ChuyenXe; 

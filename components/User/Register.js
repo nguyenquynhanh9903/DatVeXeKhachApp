@@ -162,10 +162,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     textInput: {
-        height: 50,
-        width: '100%',
-        paddingLeft: 5,
-        marginBottom: 8,
+        marginBottom: 20,
         backgroundColor: '#F2CED5',
     },
     avatar: {

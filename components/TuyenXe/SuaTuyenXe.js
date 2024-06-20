@@ -3,9 +3,10 @@ import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "rea
 import { Searchbar, TextInput } from "react-native-paper";
 import API, { endpoints } from "../../configs/API";
 import { useNavigation } from "@react-navigation/native";
+import MyStyles from "../../styles/MyStyles";
 
 const SuaTuyenXe = ({route}) => {
-    const { tuyenxeID } = route.params;
+    const { TuyenXeID } = route.params;
     const nav = useNavigation();
     const [tuyenXe, setTuyenXe] = useState({});
 
@@ -30,7 +31,7 @@ const SuaTuyenXe = ({route}) => {
 
     useEffect(() => {
         TuyenXeData();
-    }, [tuyenxeID]);
+    }, [TuyenXeID]);
 
 
     const updateState = (field, value) => {
@@ -41,7 +42,7 @@ const SuaTuyenXe = ({route}) => {
 
     const TuyenXeData = async () => {
         try {
-            const res = await API.get(`${endpoints['tuyenxe']}?matuyenxe=${tuyenxeID}`);
+            const res = await API.get(`${endpoints['tuyenxe']}?matuyenxe=${TuyenXeID}`);
             const data = res.data.results;
             if (data && data.length > 0) {
                 setTuyenXe(data[0]);
@@ -51,13 +52,9 @@ const SuaTuyenXe = ({route}) => {
         }
     };
 
-    const gotoDetail = (TuyenXeID) => {
-        nav.navigate('Danh sách tuyến xe', {TuyenXeID})
-    };
-
     const suaTuyenXe = async () => {
         try {
-            await API.put(`${endpoints['tuyenxe']}${tuyenxeID}/Sua_TuyenXe/`, {
+            await API.put(`${endpoints['tuyenxe']}${TuyenXeID}/Sua_TuyenXe/`, {
                 Ten_tuyen: tuyenXe.Ten_tuyen,
                 Diendi: tuyenXe.Diendi,
                 Diemden: tuyenXe.Diemden,
@@ -83,13 +80,43 @@ const SuaTuyenXe = ({route}) => {
     }
 
     const xoaTuyenXe = async () => {
-        try {
-            await API.delete(`${endpoints['tuyenxe']}${tuyenxeID}/Xoa_TuyenXe`,);
-            Alert.alert('Xóa tuyến xe thành công.');
-            nav.navigate('Danh sách tuyến xe');
-        } catch (err) {
-            console.error('Không thể xóa tuyến xe.', err);
-        }
+        Alert.alert(
+            'Xác nhận xóa',
+            'Bạn có chắc chắn muốn xóa tuyến xe này?',
+            [
+                {
+                    text: 'Hủy',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Xóa',
+                    onPress: async () => {
+                        try {
+                            const res = await API.delete(`${endpoints['tuyenxe']}${TuyenXeID}/Xoa_TuyenXe`);
+                            if (res.status === 204) {
+                                console.log('Tuyến xe được xóa thành công');
+                                Alert.alert(
+                                    'Xóa thành công',
+                                    'Bạn vui lòng quay lại trang Tuyến Xe để xem sự thay đổi. Nếu bạn không thấy sự thay đổi vui lòng thoát và tải lại',
+                                    [
+                                        {
+                                            text: 'OK',
+                                            onPress: () => nav.navigate('Danh sách tuyến xe')
+                                        },
+                                    ],
+                                    { cancelable: false }
+                                );
+                            } else {
+                                console.error('Không thể xóa tuyến xe');
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                        }
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
     }
 
     return (
@@ -98,16 +125,16 @@ const SuaTuyenXe = ({route}) => {
                 value={tuyenXe[t.name]}
                 onChangeText={c => updateState(t.name, c)} 
                 key={t.label} 
-                style={MyStyles.margin}
+                style={[MyStyles.margin, {backgroundColor: '#F2CED5'}]}
                 label={t.label}
                 right={<TextInput.Icon icon={t.icon} />} />)}
             
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={[styles.button, { width: 150 }]} onPress={suaTuyenXe}>
-                    <Text>SAVE</Text>
+                    <Text style={styles.buttonText}>Cập nhật</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.button, { width: 150 }]} onPress={xoaTuyenXe}>
-                    <Text>DELETE</Text>
+                    <Text style={styles.buttonText}>Xóa</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>
@@ -122,7 +149,7 @@ const styles = StyleSheet.create({
         marginBottom: 35,
     },
     button: {
-        backgroundColor: '#007bff',
+        backgroundColor: '#BF6B7B',
         paddingVertical: 12,
         borderRadius: 5,
         alignItems: 'center',
@@ -131,7 +158,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
     },
     buttonText: {
-        color: '#fff',
+        color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
     },

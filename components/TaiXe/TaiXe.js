@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { View, ActivityIndicator, Image, ScrollView, Button, Text, StyleSheet, TouchableOpacity, RefreshControl } from "react-native"
 import { List, Searchbar } from "react-native-paper";
 import API, { endpoints } from "../../configs/API";
 import MyStyles from "../../styles/MyStyles"
 import "moment/locale/vi"
+import { MyUserContext } from "../../configs/MyContext";
 
 const TaiXe = () => {
     const navigation = useNavigation();
@@ -13,7 +14,8 @@ const TaiXe = () => {
     const [q, setQ] = useState("");
     const [refreshing, setRefreshing] = useState(false);
     const [page, setPage] = useState(1);
-    const [isFetchingMore, setIsFetchingMore] = useState(false); 
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
+    const user = useContext(MyUserContext); 
 
     const loadTX = async () => {
         if (page > 0) {
@@ -61,11 +63,11 @@ const TaiXe = () => {
     }
 
     const goToHome = () => {
-        navigation.navigate('Trang Chủ');
+        navigation.navigate('Home');
     }
 
     const gotoDetail = (TaiXeID) => {
-        navigation.navigate('TaiXeDetail', { TaiXeID });
+        navigation.navigate('Thông tin tài xế', { TaiXeID });
     }
 
     const onRefresh = () => {
@@ -77,7 +79,7 @@ const TaiXe = () => {
     };
 
     const gotoAdd = () => {
-        navigation.navigate('ThemTaiXe');
+        navigation.navigate('Thêm tài xế');
     }  
 
     const search = (value, callback) => {
@@ -107,7 +109,7 @@ const TaiXe = () => {
                                             style={MyStyles.avatar} 
                                             source={{
                                                 uri: c.avatar && c.avatar.endsWith('.jpeg') 
-                                                    ? `file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252FMyMobileApp-caeae716-14f8-42e8-8345-b048446019bf/ImagePicker/${c.avatar.substring(c.avatar.lastIndexOf('/') + 1)}`
+                                                    ? `file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252FDatVeXeKhachApp-8eb51fdd-b5f9-455f-b225-8f4db299e1f9/ImagePicker/${c.avatar.substring(c.avatar.lastIndexOf('/') + 1)}`
                                                     : c.avatar
                                             }} 
                                         />
@@ -119,7 +121,7 @@ const TaiXe = () => {
                 }
                 <View style={styles.buttonContainer}>
                       <TouchableOpacity style={[styles.button, { width: 150 }]} onPress={goToHome}>
-                        <Text>Quay lại</Text>
+                        <Text style={styles.buttonText}>Quay lại</Text>
                       </TouchableOpacity>
                       <TouchableOpacity style={[styles.button, { width: 150 }]} onPress={gotoAdd}>
                         <Text style={styles.buttonText}>Thêm</Text>

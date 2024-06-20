@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { Button } from "react-native-paper";
 
 export default StyleSheet.create({
     container: {
@@ -7,7 +8,7 @@ export default StyleSheet.create({
         fontSize: 25,
         fontWeight: "bold",
         color: "#BF6B7B",
-        marginTop: 10,
+        margin: 10,
         textAlign: "center"
     }, margin: {
         margin: 10,
@@ -18,5 +19,8 @@ export default StyleSheet.create({
         height: 80,
         borderRadius:20,
         alignSelf: 'center',
-    }, 
+        padding: 10
+    }, button: {
+        color: "white",
+    }
 })

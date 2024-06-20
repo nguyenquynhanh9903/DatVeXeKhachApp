@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, Alert, View, TouchableOpacity, Button, Image} from 'react-native';
-import { ScrollView, TextInput } from 'react-native-gesture-handler';
+import { StyleSheet, Text, Alert, View, TouchableOpacity, Image} from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import API, { endpoints } from '../../configs/API';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import { TextInput, Button } from 'react-native-paper';
 
 const SuaNhanVien = ({ route }) => {
     const navigation = useNavigation();
@@ -64,7 +65,7 @@ const SuaNhanVien = ({ route }) => {
     };
 
     const gotoDetail = (NhanVienID) => {
-        navigation.navigate('NhanVienDetail', { NhanVienID })
+        navigation.navigate('Thông tin nhân viên', { NhanVienID })
     };
 
     const suaNhanVien = async () => {
@@ -87,7 +88,7 @@ const SuaNhanVien = ({ route }) => {
                 [
                     {
                         text: 'OK',
-                        onPress: () => navigation.navigate('Nhân Viên')
+                        onPress: () => navigation.navigate('Nhân viên - Danh sách')
                     },
                 ],
                 { cancelable: false }
@@ -144,16 +145,16 @@ const SuaNhanVien = ({ route }) => {
             <View style={{ marginBottom: 30 }}>
                 <View style={styles.imagePickerContainer}>
                     <Text style={{ marginRight: 10 }}>Chọn ảnh đại diện:</Text>
-                    <Button title="Chọn ảnh" onPress={pickImage} />
+                    <Button style={{backgroundColor: "#4f6e4b"}} mode="contained" onPress={pickImage}>CHỌN ẢNH</Button>
                 </View>
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     {newAvatar ? (
                         <Image source={{ uri: 
-                        `file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252FMyMobileApp-caeae716-14f8-42e8-8345-b048446019bf/ImagePicker/${newAvatar.substring(newAvatar.lastIndexOf('/') + 1)}`
+                        `file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252FDatVeXeKhachApp-8eb51fdd-b5f9-455f-b225-8f4db299e1f9/ImagePicker/${newAvatar.substring(newAvatar.lastIndexOf('/') + 1)}`
                          }} style={styles.image} />
                     ) : (
                             avatar && <Image source={{uri: avatar.endsWith('.jpeg') ? 
-                            `file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252FMyMobileApp-caeae716-14f8-42e8-8345-b048446019bf/ImagePicker/${avatar.substring(avatar.lastIndexOf('/') + 1)}` : avatar}} 
+                            `file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252FDatVeXeKhachApp-8eb51fdd-b5f9-455f-b225-8f4db299e1f9/ImagePicker/${avatar.substring(avatar.lastIndexOf('/') + 1)}` : avatar}} 
                             style={styles.image} />
                         )}
                 </View>
@@ -177,6 +178,8 @@ const styles = StyleSheet.create({
     image: {
         width: 200,
         height: 200,
+        marginTop: 10,
+        borderRadius: 5,
     },
     imagePickerContainer: {
         marginBottom: 20,
@@ -196,6 +199,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 5,
         fontSize: 16,
+        backgroundColor:'#F2CED5'
     },
     buttonContainer: {
         flexDirection: 'row',
@@ -204,19 +208,19 @@ const styles = StyleSheet.create({
         marginBottom: 35,
     },
     button: {
-        backgroundColor: '#007bff',
+        backgroundColor: '#BF6B7B',
         paddingVertical: 12,
         borderRadius: 5,
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1,
         marginHorizontal: 5,
-    },
-    buttonText: {
-        color: '#fff',
+      },
+      buttonText: {
+        color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
-    },
+      },
 });
 
 export default SuaNhanVien;

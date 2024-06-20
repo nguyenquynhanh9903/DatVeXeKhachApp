@@ -30,31 +30,31 @@ const CustomerForm = ({ onSubmit }) => {
         placeholder="Tên"
         value={name}
         onChangeText={text => setName(text)}
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
+        style={{ backgroundColor:'#F2CED5', height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
       />
       <TextInput
         placeholder="Email"
         value={email}
         onChangeText={text => setEmail(text)}
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
+        style={{ backgroundColor:'#F2CED5', height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
       />
       <TextInput
         placeholder="Điện Thoại"
         value={dienthoai}
         onChangeText={text => setDienThoai(text)}
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
+        style={{ backgroundColor:'#F2CED5', height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
       />
       <TextInput
         placeholder="Địa Chỉ"
         value={diachi}
         onChangeText={text => setDiaChi(text)}
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
+        style={{ backgroundColor:'#F2CED5', height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
       />
       <TextInput
         placeholder="Căn cước công dân"
         value={CMND}
         onChangeText={text => setCMND(text)}
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
+        style={{ backgroundColor:'#F2CED5', height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
       />
       <Button title="Thêm Khách hàng" onPress={handleAddCustomer} />
     </View>

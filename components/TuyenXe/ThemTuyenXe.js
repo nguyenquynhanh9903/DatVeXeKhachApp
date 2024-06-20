@@ -36,8 +36,6 @@ const ThemTuyenXe = () => {
 
     const addTuyenXe = async() => {
         try {
-            
-
             let form = new FormData();
             for(key in tuyenXe)
                 form.append(key, tuyenXe[key]);
@@ -53,6 +51,7 @@ const ThemTuyenXe = () => {
                 throw new Error('Đã xảy ra lỗi khi thêm tuyến xe.');
             } else {
                 Alert.alert('Thêm tuyến xe thành công.');
+                nav.navigate('Danh sách tuyến xe')
             }
 
             
@@ -65,20 +64,22 @@ const ThemTuyenXe = () => {
     };
 
     const quayLai = () => {
-        nav.navigate('Tuyến xe');
+        nav.navigate('Danh sách tuyến xe');
     }
 
     return (
         <KeyboardAvoidingView>
             <ScrollView>
+                
                 {fields.map(t => <TextInput
                 value={tuyenXe[t.name]}
                 onChangeText={c => updateState(t.name, c)} 
                 key={t.label} 
-                style={MyStyles.margin}
+                style={[MyStyles.margin, {backgroundColor:'#F2CED5'}]}
                 label={t.label}
                 right={<TextInput.Icon icon={t.icon} />} />)}
-
+                
+                
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={[styles.button, {width: 'auto'}]} onPress={quayLai}>
                         <Text style={styles.buttonText}>Quay lại</Text>
@@ -101,19 +102,19 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     button: {
-        backgroundColor: '#007bff',
+        backgroundColor: '#BF6B7B',
         paddingVertical: 12,
         borderRadius: 5,
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1,
         marginHorizontal: 5,
-    },
-    buttonText: {
-        color: '#fff',
+      },
+      buttonText: {
+        color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
-    },
+      },
 });
 
 export default ThemTuyenXe;

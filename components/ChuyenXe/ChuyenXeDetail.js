@@ -1,18 +1,19 @@
 import React, { useContext } from 'react';
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Button, ScrollView, ActivityIndicator, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
 import API, { BASE_URL, authAPI, endpoints } from "../../configs/API";
 import moment from 'moment';
 import MyStyles from '../../styles/MyStyles';
 import { height } from '@fortawesome/free-solid-svg-icons/fa0';
-import MyContext, { MyDispatchContext } from '../../configs/MyContext';
+import MyContext, { MyDispatchContext, MyUserContext } from '../../configs/MyContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { Button, TextInput } from 'react-native-paper';
 
 const ChuyenXeDetail = ({ route }) => {
     const navigation = useNavigation();
     const { ChuyenXeID, Gia } = route.params;
-    const [user, dispatch] = useContext(MyDispatchContext);
+    const user = useContext(MyUserContext);
     const [chuyenxe, setChuyenXe] = useState([]);
     const [comments, setComments] = useState();
     const [contextCom, setContextCom] = useState('');
@@ -87,11 +88,15 @@ const ChuyenXeDetail = ({ route }) => {
     };
 
     const quaylai = (TuyenXeID) => {
-        navigation.navigate('Chuyến Xe', {TuyenXeID});
+        navigation.navigate('Chuyến xe', {TuyenXeID});
     }
 
-    const khach = (ChuyenXeID) => {
-        navigation.navigate('Đặt Vé', {ChuyenXeID});
+    const dat = (ChuyenXeID) => {
+        navigation.navigate('Đặt vé', {ChuyenXeID});
+    }
+
+    const sua = (ChuyenXeID) => {
+        navigation.navigate('Sửa chuyến xe',{ChuyenXeID})
     }
 
     return (
@@ -124,20 +129,27 @@ const ChuyenXeDetail = ({ route }) => {
                             <View style={styles.buttonContainer}>
                                 {!ThoiHanChuyenXe(c.Ngay) ? (
                                     <Button 
-                                        title="Đặt vé" 
+                                        title="Đặt vé" mode='contained' style={styles.button}
                                         onPress={() => {
-                                            khach(c.id)
+                                            dat(c.id)
                                         }} 
-                                    />
+                                    >Đặt vé</Button>
                                 ) : (
                                     <Button 
-                                        title="Bình luận" 
+                                        title="Bình luận" mode='contained' style={styles.button}
                                         onPress={() => {
                                             setViewComments(true);
                                         }} 
-                                    />
+                                    >Bình luận</Button>
                                 )}
-                                <Button title='Quay lại' onPress={() => quaylai(c.Ma_Tuyen)} style={styles.button}/>
+                                {user && user.Loai_NguoiDung === "1" && (
+                                    <Button
+                                        title='Chỉnh sửa'
+                                        onPress={() => sua(c.id)}
+                                        mode='contained' style={styles.button}
+                                    >Chỉnh sửa</Button>
+                                )}
+                                <Button title='Quay lại' onPress={() => quaylai(c.Ma_Tuyen)} mode='contained' style={styles.button}>Quay lại</Button>
                             </View>
                         </View>
                     ))}
@@ -150,7 +162,7 @@ const ChuyenXeDetail = ({ route }) => {
                         ) : null}
                             <TextInput
                                 style={styles.inputComment}
-                                placeholder="Nhập nội dung bình luận"
+                                placeholder="Viết bình luận..."
                                 value={contextCom}
                                 onChangeText={(text) => setContextCom(text)}
                             />
@@ -169,7 +181,7 @@ const ChuyenXeDetail = ({ route }) => {
                                     <View key={c.id} style={styles.commentItem}>
                                         <Image style={styles.commentAvatar} source={{ uri: c.user.avatar }} />
                                         <View style={styles.commentContent}>
-                                            <Text style={styles.commentTen}>{c.user.username}</Text>
+                                            <Text style={styles.commentTen}>{[c.user.first_name, c.user.last_name]. join(' ')}</Text>
                                             <Text style={styles.commentText}>{c.content}</Text>
                                             <Text style={styles.commentDate}>{formDateComment(c.created_date)}</Text>
                                         </View>
@@ -190,26 +202,29 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     title: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 15,
-        marginTop: -32,
-        marginLeft: 50
+        marginTop: -20,
+        margin: 10,
+        justifyContent: 'center',
+        color: '#bf6b7b'
     },
     detailItem: {
         marginBottom: 10,
+        marginLeft: -10,
     },
     label: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
     },
     info: {
-        fontSize: 16,
+        fontSize: 18,
     },
     commentContainer: {
         flex: 1,
         backgroundColor: '#FFFFFF',
-        padding: 10,
+        padding: 5,
     },
     commentTitle: {
         fontSize: 20,
@@ -250,9 +265,10 @@ const styles = StyleSheet.create({
         borderWidth: 1, // Đường viền
         borderColor: 'gray', // Màu đường viền
         borderRadius: 5, // Độ cong góc của viền
-        paddingHorizontal: 10, // Khoảng cách lề bên trong theo chiều ngang
+        paddingHorizontal: 8, // Khoảng cách lề bên trong theo chiều ngang
         paddingVertical: 8, // Khoảng cách lề bên trong theo chiều dọc
         marginRight: 10, // Khoảng cách với Button
+        backgroundColor:'#F2CED5',
     },
     cancelButton: {
         color: 'red', // Màu chữ
@@ -268,8 +284,20 @@ const styles = StyleSheet.create({
         marginVertical: 10, // Khoảng cách phía trên và phía dưới
     },
     button: {
-        flex: 1, // Mỗi nút chiếm đều phần bằng nhau
-        marginHorizontal: 5, // Khoảng cách giữa các nút
+        width:200,
+        height: 50,
+        backgroundColor: '#BF6B7B',
+        //paddingVertical: 12,
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        margin: 5,
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 

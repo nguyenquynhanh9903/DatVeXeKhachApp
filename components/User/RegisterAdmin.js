@@ -123,7 +123,7 @@ const RegisterAdmin = () => {
                         "Đăng ký tài khoản thành công",
                         [{text: "OK", onPress: () => resetForm()}]
                     );
-                    nav.navigate("HomeAdmin");
+                    nav.navigate("Home");
                 }
                     
 
